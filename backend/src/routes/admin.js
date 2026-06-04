@@ -14,6 +14,7 @@ const {
   cambiarRol,
 
 } = require('../controllers/usersController');
+const { getMovimientos } = require('../controllers/stockController');
 
 router.use(requireAuth, requireAdmin);
 
@@ -29,5 +30,7 @@ router.delete('/usuarios/:id', eliminarUsuario);
 
 router.get('/roles', getUsuariosParaRoles);
 router.patch('/roles/:id', cambiarRol); 
+
+router.get('/movimientos', getMovimientos);
 
 module.exports = router;

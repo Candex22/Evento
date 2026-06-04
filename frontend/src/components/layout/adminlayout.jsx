@@ -7,6 +7,7 @@ const NAV = [
   { to: '/admin/pending',  label: 'Pendientes', icon: '◷' },
   { to: '/admin/users',    label: 'Usuarios',   icon: '◈' },
   { to: '/admin/roles',    label: 'Roles',      icon: '◉' },
+  { to: '/admin/movimientos', label: 'Movimientos', icon: '⇅' },
 ]
 
 export default function AdminLayout({ children, pendingCount = 0 }) {
@@ -25,7 +26,7 @@ export default function AdminLayout({ children, pendingCount = 0 }) {
       <aside style={{ ...styles.sidebar, transform: open ? 'translateX(0)' : undefined }}>
         <div style={styles.brand}>
           <span style={styles.brandIcon}>⬡</span>
-          <span style={styles.brandText}>PAÑOL</span>
+          <span style={styles.brandText}>EVENTO</span>
           <span style={styles.brandSub}>admin</span>
         </div>
 
@@ -57,7 +58,7 @@ export default function AdminLayout({ children, pendingCount = 0 }) {
             </span>
             <div>
               <div style={styles.userName}>{user?.name_user}</div>
-              <div style={styles.userRole}>administrador</div>
+              <div style={styles.userRole}>{user?.rol}</div>
             </div>
           </div>
           <button
@@ -123,7 +124,7 @@ const styles = {
     padding: '22px 20px 16px',
     borderBottom: '1px solid #2e2e2e',
   },
-  brandIcon: { fontSize: 18, color: '#e8c547' },
+  brandIcon: { fontSize: 18, color: '#e89547' },
   brandText: {
     fontFamily: "'DM Mono', monospace",
     fontSize: 14,
@@ -158,12 +159,12 @@ const styles = {
   },
   navLinkActive: {
     background: '#1e1a0e',
-    color: '#e8c547',
+    color: '#e89547',
   },
   navIcon: { fontSize: 14, width: 16, textAlign: 'center', flexShrink: 0 },
   navBadge: {
     marginLeft: 'auto',
-    background: '#e8c547',
+    background: '#e89547',
     color: '#111',
     fontSize: 10,
     fontWeight: 700,
@@ -190,7 +191,7 @@ const styles = {
     justifyContent: 'center',
     fontSize: 13,
     fontWeight: 600,
-    color: '#e8c547',
+    color: '#e89547',
     flexShrink: 0,
   },
   userName: { fontSize: 13, color: '#f0ede8', fontWeight: 500 },

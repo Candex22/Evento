@@ -1,7 +1,16 @@
 import { useEffect, useState } from 'react'
 import AdminLayout from '../components/layout/AdminLayout'
-import { getUsuariosRoles, darAdmin, quitarAdmin, countPendientes } from '../api/admin'
+import { getUsuariosRoles, cambiarRol, countPendientes } from '../api/admin'
 import { useToast, ToastContainer } from '../hooks/useToast'
+
+const ROLES = ['admin', 'mozo', 'cajero', 'buffet']
+
+const ROL_COLOR = {
+  admin:  '#e89547',
+  mozo:   '#5b9bd5',
+  cajero: '#4caf7d',
+  buffet: '#c97bd5',
+}
 
 export default function AdminRolesPage() {
   const [users, setUsers]   = useState([])
@@ -25,26 +34,22 @@ export default function AdminRolesPage() {
 
   useEffect(() => { load() }, [])
 
-  const doRole = async (id, isAdmin) => {
+  const onChangeRol = async (id, nuevoRol, rolActual) => {
+    if (nuevoRol === rolActual) return
     setBusy(b => ({ ...b, [id]: true }))
+    // Optimista: refleja el cambio en la UI al instante
+    setUsers(us => us.map(u => u.id_user === id ? { ...u, rol: nuevoRol } : u))
     try {
-      if (isAdmin) {
-        await quitarAdmin(id)
-        toast.success('Permisos de administrador revocados.')
-      } else {
-        await darAdmin(id)
-        toast.success('Permisos de administrador otorgados.')
-      }
-      load()
+      await cambiarRol(id, nuevoRol)
+      toast.success(`Rol actualizado a ${nuevoRol}.`)
     } catch (err) {
       toast.error(err.message)
+      // Revertir si falla
+      setUsers(us => us.map(u => u.id_user === id ? { ...u, rol: rolActual } : u))
     } finally {
       setBusy(b => { const n = { ...b }; delete n[id]; return n })
     }
   }
-
-  const admins  = users.filter(u => u.rol === 'administrador')
-  const regular = users.filter(u => u.rol !== 'administrador')
 
   return (
     <AdminLayout pendingCount={pendingCount}>
@@ -52,120 +57,76 @@ export default function AdminRolesPage() {
 
       <div style={styles.header}>
         <h1 style={styles.title}>Gestión de roles</h1>
-        <p style={styles.sub}>Solo usuarios activos pueden ser administradores</p>
+        <p style={styles.sub}>Asigná el rol de cada usuario activo del sistema</p>
       </div>
 
       {loading ? (
         <div style={styles.loading}><span className="spinner" /> Cargando…</div>
+      ) : users.length === 0 ? (
+        <p style={styles.empty}>No hay usuarios activos para gestionar.</p>
       ) : (
-        <>
-          {/* Administradores actuales */}
-          <section style={styles.section}>
-            <h2 style={styles.sectionTitle}>
-              <span style={{ color: '#e8c547' }}>◉</span> Administradores
-              <span style={styles.count}>{admins.length}</span>
-            </h2>
-            {admins.length === 0 ? (
-              <p style={styles.empty}>No hay otros administradores.</p>
-            ) : (
-              <div className="card" style={{ padding: 0 }}>
-                <div className="table-wrap">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Nombre</th>
-                        <th>Usuario</th>
-                        <th>Correo</th>
-                        <th>Acción</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {admins.map(u => (
-                        <tr key={u.id_user}>
-                          <td><strong>{u.nombre} {u.apellido}</strong></td>
-                          <td><span style={styles.mono}>{u.name_user}</span></td>
-                          <td>{u.correo_electronico}</td>
-                          <td>
-                            <button
-                              className="btn btn-warn btn-sm"
-                              disabled={busy[u.id_user]}
-                              onClick={() => {
-                                if (confirm(`¿Revocar permisos de admin a ${u.name_user}?`))
-                                  doRole(u.id_user, true)
-                              }}
-                            >
-                              {busy[u.id_user] ? <span className="spinner" /> : '↓'} Quitar admin
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-          </section>
-
-          {/* Usuarios regulares */}
-          <section style={styles.section}>
-            <h2 style={styles.sectionTitle}>
-              <span style={{ color: '#9a9690' }}>◈</span> Usuarios regulares
-              <span style={styles.count}>{regular.length}</span>
-            </h2>
-            {regular.length === 0 ? (
-              <p style={styles.empty}>No hay usuarios regulares activos.</p>
-            ) : (
-              <div className="card" style={{ padding: 0 }}>
-                <div className="table-wrap">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Nombre</th>
-                        <th>Usuario</th>
-                        <th>Correo</th>
-                        <th>Acción</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {regular.map(u => (
-                        <tr key={u.id_user}>
-                          <td><strong>{u.nombre} {u.apellido}</strong></td>
-                          <td><span style={styles.mono}>{u.name_user}</span></td>
-                          <td>{u.correo_electronico}</td>
-                          <td>
-                            <button
-                              className="btn btn-success btn-sm"
-                              disabled={busy[u.id_user]}
-                              onClick={() => {
-                                if (confirm(`¿Dar permisos de admin a ${u.name_user}?`))
-                                  doRole(u.id_user, false)
-                              }}
-                            >
-                              {busy[u.id_user] ? <span className="spinner" /> : '↑'} Hacer admin
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-          </section>
-        </>
+        <div className="card" style={{ padding: 0 }}>
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Usuario</th>
+                  <th>Correo</th>
+                  <th>Rol</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map(u => (
+                  <tr key={u.id_user}>
+                    <td><strong>{u.nombre} {u.apellido}</strong></td>
+                    <td><span style={styles.mono}>{u.name_user}</span></td>
+                    <td>{u.correo_electronico}</td>
+                    <td>
+                      <div style={styles.rolCell}>
+                        <span style={{ ...styles.dot, background: ROL_COLOR[u.rol] || '#9a9690' }} />
+                        <select
+                          value={u.rol}
+                          disabled={busy[u.id_user]}
+                          onChange={e => onChangeRol(u.id_user, e.target.value, u.rol)}
+                          style={styles.select}
+                        >
+                          {ROLES.map(r => (
+                            <option key={r} value={r}>{r}</option>
+                          ))}
+                        </select>
+                        {busy[u.id_user] && <span className="spinner" />}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       )}
     </AdminLayout>
   )
 }
 
 const styles = {
-  header:       { marginBottom: 28 },
-  title:        { fontSize: 22, fontWeight: 600, color: '#f0ede8', marginBottom: 4 },
-  sub:          { fontSize: 13, color: '#5a5754' },
-  loading:      { display: 'flex', alignItems: 'center', gap: 10, color: '#5a5754', fontSize: 13, padding: 24 },
-  section:      { marginBottom: 32 },
-  sectionTitle: { display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 500, color: '#9a9690', marginBottom: 12 },
-  count:        { background: '#222', border: '1px solid #2e2e2e', borderRadius: 20, fontSize: 11, padding: '1px 8px', fontFamily: "'DM Mono', monospace", color: '#5a5754' },
-  mono:         { fontFamily: "'DM Mono', monospace", fontSize: 12, color: '#9a9690' },
-  empty:        { fontSize: 13, color: '#5a5754', padding: '16px 0' },
+  header:  { marginBottom: 28 },
+  title:   { fontSize: 22, fontWeight: 600, color: '#f0ede8', marginBottom: 4 },
+  sub:     { fontSize: 13, color: '#5a5754' },
+  loading: { display: 'flex', alignItems: 'center', gap: 10, color: '#5a5754', fontSize: 13, padding: 24 },
+  empty:   { fontSize: 13, color: '#5a5754', padding: '16px 0' },
+  mono:    { fontFamily: "'DM Mono', monospace", fontSize: 12, color: '#9a9690' },
+  rolCell: { display: 'flex', alignItems: 'center', gap: 8 },
+  dot:     { width: 8, height: 8, borderRadius: '50%', flexShrink: 0 },
+  select:  {
+    background: '#181818',
+    color: '#f0ede8',
+    border: '1px solid #2e2e2e',
+    borderRadius: 6,
+    padding: '5px 10px',
+    fontSize: 13,
+    fontFamily: "'DM Mono', monospace",
+    cursor: 'pointer',
+    textTransform: 'capitalize',
+  },
 }

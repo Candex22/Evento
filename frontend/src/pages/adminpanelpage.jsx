@@ -21,7 +21,7 @@ export default function AdminPanelPage() {
       title: 'Usuarios pendientes',
       desc: 'Aprobar o rechazar solicitudes de registro.',
       badge: pendingCount || null,
-      color: '#e8c547',
+      color: '#e89547',
     },
     {
       to: '/admin/users',

@@ -9,7 +9,7 @@ const ESTADO_BADGE = {
   pendiente:'badge-pending',
 }
 const ROL_BADGE = {
-  administrador: 'badge-admin',
+  admin: 'badge-admin',
   usuario:       'badge-user',
 }
 
@@ -63,7 +63,7 @@ export default function AdminUsersPage() {
           <p style={styles.sub}>{users.length} usuario{users.length !== 1 ? 's' : ''} en el sistema</p>
         </div>
         <div style={styles.filters}>
-          {['todos','activo','inactivo','pendiente','administrador'].map(f => (
+          {['todos','activo','inactivo','pendiente','admin','mozo','cajero','buffet'].map(f => (
             <button
               key={f}
               onClick={() => setFilter(f)}
@@ -173,7 +173,7 @@ const styles = {
   },
   filterBtnActive: {
     background: '#2a1f0a',
-    borderColor: '#e8c547',
-    color: '#e8c547',
+    borderColor: '#e89547',
+    color: '#e89547',
   },
 }

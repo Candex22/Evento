@@ -21,7 +21,9 @@ export default function LoginPage() {
     try {
       const data = await apiLogin(form.correo_electronico, form.contrasena)
       login(data.usuario)
-      navigate(data.usuario.rol === 'administrador' ? '/admin' : '/dashboard', { replace: true })
+      const rol = data.usuario.rol
+      const rutas = { administrador: '/admin', buffet: '/buffet', mozo: '/mozo', cajero: '/cajero' }
+      navigate(rutas[rol] || '/dashboard', { replace: true })
     } catch (err) {
       setError(err.message)
     } finally {
@@ -124,7 +126,7 @@ const styles = {
   },
   logoIcon: {
     fontSize: 22,
-    color: '#e8c547',
+    color: '#e89547',
     lineHeight: 1,
   },
   logoText: {

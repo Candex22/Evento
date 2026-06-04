@@ -6,6 +6,9 @@ const cors = require('cors');
 
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
+const buffetRoutes = require('./routes/buffet');
+const mozoRoutes = require('./routes/mozo');
+const cajeroRoutes = require('./routes/cajero');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -33,6 +36,9 @@ app.use(session({
 // Rutas
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/buffet', buffetRoutes);
+app.use('/api/mozo', mozoRoutes);
+app.use('/api/cajero', cajeroRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

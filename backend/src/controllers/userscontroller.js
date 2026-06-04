@@ -162,7 +162,7 @@ async function getUsuariosParaRoles(req, res) {
   }
 }
 
-const ROLES_VALIDOS = ['admin', 'mozo', 'cajero', 'buffet'];
+const ROLES_VALIDOS = ['administrador', 'mozo', 'cajero', 'buffet'];
 
 async function cambiarRol(req, res) {
   const userId = parseInt(req.params.id, 10);
@@ -198,6 +198,5 @@ module.exports = {
   desactivarUsuario,
   eliminarUsuario,
   getUsuariosParaRoles,
-  darAdmin,
-  quitarAdmin,
+  cambiarRol,
 };

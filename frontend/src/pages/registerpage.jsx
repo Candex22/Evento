@@ -66,8 +66,8 @@ export default function RegisterPage() {
       <div style={styles.grid} aria-hidden="true" />
       <div style={styles.box}>
         <div style={styles.logo}>
-          <span style={{ fontSize: 22, color: '#e8c547' }}>⬡</span>
-          <span style={styles.logoText}>PAÑOL</span>
+          <span style={{ fontSize: 22, color: '#e89547' }}>⬡</span>
+          <span style={styles.logoText}>EVENTO</span>
         </div>
 
         <h1 style={styles.heading}>Crear cuenta</h1>

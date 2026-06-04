@@ -93,7 +93,7 @@ async function register(req, res) {
 
     await pool.query(
       `INSERT INTO usuario (name_user, nombre, apellido, correo_electronico, contrasena, rol, estado)
-       VALUES ($1, $2, $3, $4, $5, 'usuario', 'pendiente')`,
+       VALUES ($1, $2, $3, $4, $5, 'mozo', 'pendiente')`,
       [name_user, nombre, apellido, correo_electronico, hash]
     );
 

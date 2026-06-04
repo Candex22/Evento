@@ -14,5 +14,7 @@ export const eliminarUsuario  = (id) => del(`/admin/usuarios/${id}`)
 
 // Roles
 export const getUsuariosRoles = () => get('/admin/roles')
-export const darAdmin         = (id) => patch(`/admin/roles/${id}/dar-admin`)
-export const quitarAdmin      = (id) => patch(`/admin/roles/${id}/quitar-admin`)
+export const cambiarRol       = (id, rol) => patch(`/admin/roles/${id}`, { rol })
+
+//Buffet
+export const getMovimientos = () => get('/admin/movimientos')
